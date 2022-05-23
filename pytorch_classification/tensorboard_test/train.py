@@ -22,8 +22,8 @@ def main(args):
     # 实例化SummaryWriter对象
     #tensorborad文件保存runs下
     tb_writer = SummaryWriter(log_dir="runs/flower_experiment")
-    if os.path.exists("/content/drive/MyDrive/models/resnet-flower") is False:
-        os.makedirs("/content/drive/MyDrive/models/resnet-flower")
+    if os.path.exists("./weights") is False:
+        os.makedirs("./weights")
 
     # 划分数据为训练集和验证集
     train_images_path, train_images_label, val_images_path, val_images_label = read_split_data(args.data_path)
@@ -139,7 +139,7 @@ def main(args):
                                 global_step=epoch)
 
         # save weights
-        torch.save(model.state_dict(), "/content/drive/MyDrive/models/resnet-flower/model-{}.pth".format(epoch))
+        torch.save(model.state_dict(), "./weights/model-{}.pth".format(epoch))
 
 
 if __name__ == '__main__':
