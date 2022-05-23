@@ -71,6 +71,7 @@ def main(args):
     model = resnet34(num_classes=args.num_classes).to(device)
 
     # 将模型写入tensorboard
+    # 添加图像初始的大小，在输出的model中会根据网络训练显示路径上的图像大小
     init_img = torch.zeros((1, 3, 224, 224), device=device)
     tb_writer.add_graph(model, init_img)
 
@@ -157,6 +158,7 @@ if __name__ == '__main__':
 
     # resnet34 官方权重下载地址
     # https://download.pytorch.org/models/resnet34-333f7ec4.pth
+    #使用预训练权重可以从以上网址下载，然后default指向该路径即可
     parser.add_argument('--weights', type=str, default='resNet34.pth',
                         help='initial weights path')
     parser.add_argument('--freeze-layers', type=bool, default=False)
