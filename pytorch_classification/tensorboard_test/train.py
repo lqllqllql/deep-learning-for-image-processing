@@ -20,6 +20,7 @@ def main(args):
     print(args)
     print('Start Tensorboard with "tensorboard --logdir=runs", view at http://localhost:6006/')
     # 实例化SummaryWriter对象
+    #tensorborad文件保存runs下
     tb_writer = SummaryWriter(log_dir="runs/flower_experiment")
     if os.path.exists("./weights") is False:
         os.makedirs("./weights")
@@ -120,7 +121,7 @@ def main(args):
 
         # add figure into tensorboard
         fig = plot_class_preds(net=model,
-                               images_dir="./plot_img",
+                               images_dir="/content/drive/MyDrive/flower_test",
                                transform=data_transform["val"],
                                num_plot=5,
                                device=device)
@@ -138,7 +139,7 @@ def main(args):
                                 global_step=epoch)
 
         # save weights
-        torch.save(model.state_dict(), "./weights/model-{}.pth".format(epoch))
+        torch.save(model.state_dict(), "/content/drive/MyDrive/models/resnet-flower".format(epoch))
 
 
 if __name__ == '__main__':
