@@ -1,3 +1,4 @@
+# resnet的迁移学习，使用官方文档的预训练权重
 import os
 import sys
 import json
