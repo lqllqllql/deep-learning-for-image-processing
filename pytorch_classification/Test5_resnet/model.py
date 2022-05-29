@@ -1,12 +1,13 @@
 import torch.nn as nn
 import torch
 
-
+# 输入输出图像大小相同的残差块
 class BasicBlock(nn.Module):
     expansion = 1
 
     def __init__(self, in_channel, out_channel, stride=1, downsample=None, **kwargs):
         super(BasicBlock, self).__init__()
+        # 残差块的网络层结构
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
                                kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channel)
@@ -15,9 +16,12 @@ class BasicBlock(nn.Module):
                                kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channel)
         self.downsample = downsample
-
+    
+    # 前向传播过程
     def forward(self, x):
+        # 恒等映射
         identity = x
+        # 不需要下采样
         if self.downsample is not None:
             identity = self.downsample(x)
 
@@ -34,6 +38,7 @@ class BasicBlock(nn.Module):
         return out
 
 
+# 输入输出图像大小不同的残差块，需要进行下采样
 class Bottleneck(nn.Module):
     """
     注意：原论文中，在虚线残差结构的主分支上，第一个1x1卷积层的步距是2，第二个3x3卷积层步距是1。
@@ -41,6 +46,7 @@ class Bottleneck(nn.Module):
     这么做的好处是能够在top1上提升大概0.5%的准确率。
     可参考Resnet v1.5 https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch
     """
+    # 通道的扩展倍数
     expansion = 4
 
     def __init__(self, in_channel, out_channel, stride=1, downsample=None,
@@ -83,13 +89,15 @@ class Bottleneck(nn.Module):
         out = self.relu(out)
 
         return out
+#https://keras.io/guides/functional_api/
+#The functional API can handle models with non-linear topology, shared layers, and even multiple inputs or outputs.
 
-
+# 定义resnet模型
 class ResNet(nn.Module):
 
     def __init__(self,
                  block,
-                 blocks_num,
+                 blocks_num, # 每个层的倍数
                  num_classes=1000,
                  include_top=True,
                  groups=1,
@@ -106,6 +114,7 @@ class ResNet(nn.Module):
         self.bn1 = nn.BatchNorm2d(self.in_channel)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        # conv2_x, conv3_x,  conv4_x,  conv5_x
         self.layer1 = self._make_layer(block, 64, blocks_num[0])
         self.layer2 = self._make_layer(block, 128, blocks_num[1], stride=2)
         self.layer3 = self._make_layer(block, 256, blocks_num[2], stride=2)
@@ -117,7 +126,8 @@ class ResNet(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-
+    
+    # 定义_make_layer函数
     def _make_layer(self, block, channel, block_num, stride=1):
         downsample = None
         if stride != 1 or self.in_channel != channel * block.expansion:
